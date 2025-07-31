@@ -1,35 +1,38 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
+const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// Ganti dengan MongoDB URI kamu
-const mongoURI = 'mongodb+srv://akbar:akbar123@cluster0.6vot4or.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Koneksi MongoDB
-mongoose.connect(mongoURI)
-  .then(() => console.log('✅ Terhubung ke MongoDB'))
-  .catch(err => console.error('❌ Gagal konek ke MongoDB:', err));
+// MongoDB connection
+const uri = 'mongodb+srv://akbar:akbar123@cluster0.6vot4or.mongodb.net/heart_attack?retryWrites=true&w=majority&appName=Cluster0';
 
-const HeartSchema = new mongoose.Schema({}, { collection: 'reviews', strict: false });
-const Heart = mongoose.model('Heart', HeartSchema);
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
+// Model (non-strict supaya bisa fleksibel dengan field CSV)
+const ReviewSchema = new mongoose.Schema({}, { collection: 'review', strict: false });
+const Review = mongoose.model('Review', ReviewSchema);
 
-app.use(express.static(path.join(__dirname)));
-
-
+// Endpoint
 app.get('/api/reviews', async (req, res) => {
   try {
-    const data = await Heart.find().limit(100);
+    const data = await Review.find().limit(100); // limit agar ringan
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: 'Gagal mengambil data' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Jalankan server
-app.listen(port, () => {
-  console.log(`🚀 Server berjalan di http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
