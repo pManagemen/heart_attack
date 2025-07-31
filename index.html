@@ -34,7 +34,7 @@
     let originalData = [];
 
     async function fetchData() {
-      const res = await fetch('/api/reviews');
+      const res = await fetch('https://heartattack-production.up.railway.app/api/reviews');
       const data = await res.json();
       originalData = data;
       renderTable(data);
