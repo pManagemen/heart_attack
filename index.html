@@ -17,16 +17,17 @@
   <input type="text" id="searchInput" placeholder="Cari berdasarkan nama, usia, dsb..." />
   <table>
     <thead>
-      <tr>
-        <th>Age</th>
-        <th>Sex</th>
-        <th>Chest Pain Type</th>
-        <th>Resting BP</th>
-        <th>Cholesterol</th>
-        <th>Fasting BS</th>
-        <th>Target</th>
-      </tr>
-    </thead>
+  <tr>
+    <th>Age</th>
+    <th>Sex</th>
+    <th>Chest Pain Type (cp)</th>
+    <th>Resting BP (trestbps)</th>
+    <th>Cholesterol (chol)</th>
+    <th>Fasting BS (fbs)</th>
+    <th>Target</th>
+  </tr>
+</thead>
+
     <tbody id="dataTable"></tbody>
   </table>
 
@@ -40,22 +41,23 @@
       renderTable(data);
     }
 
-    function renderTable(data) {
-      const table = document.getElementById('dataTable');
-      table.innerHTML = '';
-      data.forEach(item => {
-        const row = `<tr>
-          <td>${item.Age || '-'}</td>
-          <td>${item.Sex || '-'}</td>
-          <td>${item.ChestPainType || '-'}</td>
-          <td>${item.RestingBP || '-'}</td>
-          <td>${item.Cholesterol || '-'}</td>
-          <td>${item.FastingBS || '-'}</td>
-          <td>${item.HeartDisease !== undefined ? item.HeartDisease : '-'}</td>
-        </tr>`;
-        table.innerHTML += row;
-      });
-    }
+ function renderTable(data) {
+  const table = document.getElementById('dataTable');
+  table.innerHTML = '';
+  data.forEach(item => {
+    const row = `<tr>
+      <td>${item.age ?? '-'}</td>
+      <td>${item.sex ?? '-'}</td>
+      <td>${item.cp ?? '-'}</td>
+      <td>${item.trestbps ?? '-'}</td>
+      <td>${item.chol ?? '-'}</td>
+      <td>${item.fbs ?? '-'}</td>
+      <td>${item.target ?? '-'}</td>
+    </tr>`;
+    table.innerHTML += row;
+  });
+}
+
 
     document.getElementById('searchInput').addEventListener('input', e => {
       const keyword = e.target.value.toLowerCase();
