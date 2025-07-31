@@ -13,15 +13,14 @@ mongoose.connect(mongoURI)
   .then(() => console.log('✅ Terhubung ke MongoDB'))
   .catch(err => console.error('❌ Gagal konek ke MongoDB:', err));
 
-// Skema dinamis untuk koleksi heart_attack atau reviews
-const HeartSchema = new mongoose.Schema({}, { collection: 'heart_attack', strict: false });
+const HeartSchema = new mongoose.Schema({}, { collection: 'reviews', strict: false });
 const Heart = mongoose.model('Heart', HeartSchema);
 
-// Menyajikan file statis (index.html)
+
 app.use(express.static(path.join(__dirname)));
 
-// Endpoint API
-app.get('/api/heart', async (req, res) => {
+
+app.get('/api/reviews', async (req, res) => {
   try {
     const data = await Heart.find().limit(100);
     res.json(data);
