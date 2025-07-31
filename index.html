@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Heart Attack</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input[type="text"] { padding: 8px; margin-bottom: 10px; width: 300px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; font-size: 14px; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Data Heart Attack</h1>
+  <input type="text" id="searchInput" placeholder="Cari usia, kolesterol, atau tekanan darah..." />
+
+  <table>
+    <thead>
+      <tr>
+        <th>Age</th>
+        <th>Sex</th>
+        <th>CP</th>
+        <th>Trestbps</th>
+        <th>Chol</th>
+        <th>FBS</th>
+        <th>RestECG</th>
+        <th>Thalach</th>
+        <th>Exang</th>
+        <th>Oldpeak</th>
+        <th>Slope</th>
+        <th>CA</th>
+        <th>Thal</th>
+        <th>Target</th>
+      </tr>
+    </thead>
+    <tbody id="data-body"></tbody>
+  </table>
+
+  <script>
+    let allData = [];
+
+    fetch('/heart')
+      .then(res => res.json())
+      .then(data => {
+        allData = data;
+        renderTable(data);
+      });
+
+    function renderTable(data) {
+      const tbody = document.getElementById('data-body');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.age ?? '-'}</td>
+          <td>${row.sex ?? '-'}</td>
+          <td>${row.cp ?? '-'}</td>
+          <td>${row.trestbps ?? '-'}</td>
+          <td>${row.chol ?? '-'}</td>
+          <td>${row.fbs ?? '-'}</td>
+          <td>${row.restecg ?? '-'}</td>
+          <td>${row.thalach ?? '-'}</td>
+          <td>${row.exang ?? '-'}</td>
+          <td>${row.oldpeak ?? '-'}</td>
+          <td>${row.slope ?? '-'}</td>
+          <td>${row.ca ?? '-'}</td>
+          <td>${row.thal ?? '-'}</td>
+          <td>${row.target ?? '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const keyword = this.value.toLowerCase();
+      const filtered = allData.filter(item =>
+        String(item.age).includes(keyword) ||
+        String(item.trestbps).includes(keyword) ||
+        String(item.chol).includes(keyword)
+      );
+      renderTable(filtered);
+    });
+  </script>
+</body>
+</html>
