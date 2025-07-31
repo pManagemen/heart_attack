@@ -1,37 +1,36 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+
 const app = express();
+const port = process.env.PORT || 3000;
 
-// Koneksi ke MongoDB tanpa .env
-mongoose.connect('mongodb://127.0.0.1:27017/sample_mflix', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+// Ganti dengan MongoDB URI kamu
+const mongoURI = 'mongodb+srv://akbar:akbar123@cluster0.6vot4or.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
-// Skema data (non-strict untuk menyesuaikan isi koleksi)
-const Heart = mongoose.model('Heart', new mongoose.Schema({}, {
-  collection: 'reviews', // pastikan ini koleksi yang berisi data heart attack
-  strict: false
-}));
+// Koneksi MongoDB
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ Terhubung ke MongoDB'))
+  .catch(err => console.error('❌ Gagal konek ke MongoDB:', err));
 
-// Middleware untuk file statis (index.html di root folder)
+// Skema dinamis untuk koleksi heart_attack atau reviews
+const HeartSchema = new mongoose.Schema({}, { collection: 'heart_attack', strict: false });
+const Heart = mongoose.model('Heart', HeartSchema);
+
+// Menyajikan file statis (index.html)
 app.use(express.static(path.join(__dirname)));
 
-// Endpoint untuk ambil data heart attack
-app.get('/heart', async (req, res) => {
+// Endpoint API
+app.get('/api/heart', async (req, res) => {
   try {
-    const data = await Heart.find().limit(100); // ambil 100 data pertama
+    const data = await Heart.find().limit(100);
     res.json(data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Gagal mengambil data heart attack' });
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal mengambil data' });
   }
 });
 
-// Jalankan server di port 3000
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+// Jalankan server
+app.listen(port, () => {
+  console.log(`🚀 Server berjalan di http://localhost:${port}`);
 });

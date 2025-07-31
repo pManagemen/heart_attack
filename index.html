@@ -2,85 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Data Heart Attack</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input[type="text"] { padding: 8px; margin-bottom: 10px; width: 300px; }
+    body { font-family: sans-serif; padding: 20px; }
+    input { padding: 8px; width: 300px; margin-bottom: 20px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; font-size: 14px; }
-    th { background-color: #f2f2f2; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
   </style>
 </head>
 <body>
   <h1>Data Heart Attack</h1>
-  <input type="text" id="searchInput" placeholder="Cari usia, kolesterol, atau tekanan darah..." />
-
+  <input type="text" id="searchInput" placeholder="Cari berdasarkan nama, usia, dsb..." />
   <table>
     <thead>
       <tr>
         <th>Age</th>
         <th>Sex</th>
-        <th>CP</th>
-        <th>Trestbps</th>
-        <th>Chol</th>
-        <th>FBS</th>
-        <th>RestECG</th>
-        <th>Thalach</th>
-        <th>Exang</th>
-        <th>Oldpeak</th>
-        <th>Slope</th>
-        <th>CA</th>
-        <th>Thal</th>
+        <th>Chest Pain Type</th>
+        <th>Resting BP</th>
+        <th>Cholesterol</th>
+        <th>Fasting BS</th>
         <th>Target</th>
       </tr>
     </thead>
-    <tbody id="data-body"></tbody>
+    <tbody id="dataTable"></tbody>
   </table>
 
   <script>
-    let allData = [];
+    let originalData = [];
 
-    fetch('/heart')
-      .then(res => res.json())
-      .then(data => {
-        allData = data;
-        renderTable(data);
-      });
+    async function fetchData() {
+      const res = await fetch('/api/heart');
+      const data = await res.json();
+      originalData = data;
+      renderTable(data);
+    }
 
     function renderTable(data) {
-      const tbody = document.getElementById('data-body');
-      tbody.innerHTML = '';
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${row.age ?? '-'}</td>
-          <td>${row.sex ?? '-'}</td>
-          <td>${row.cp ?? '-'}</td>
-          <td>${row.trestbps ?? '-'}</td>
-          <td>${row.chol ?? '-'}</td>
-          <td>${row.fbs ?? '-'}</td>
-          <td>${row.restecg ?? '-'}</td>
-          <td>${row.thalach ?? '-'}</td>
-          <td>${row.exang ?? '-'}</td>
-          <td>${row.oldpeak ?? '-'}</td>
-          <td>${row.slope ?? '-'}</td>
-          <td>${row.ca ?? '-'}</td>
-          <td>${row.thal ?? '-'}</td>
-          <td>${row.target ?? '-'}</td>
-        `;
-        tbody.appendChild(tr);
+      const table = document.getElementById('dataTable');
+      table.innerHTML = '';
+      data.forEach(item => {
+        const row = `<tr>
+          <td>${item.Age || '-'}</td>
+          <td>${item.Sex || '-'}</td>
+          <td>${item.ChestPainType || '-'}</td>
+          <td>${item.RestingBP || '-'}</td>
+          <td>${item.Cholesterol || '-'}</td>
+          <td>${item.FastingBS || '-'}</td>
+          <td>${item.HeartDisease !== undefined ? item.HeartDisease : '-'}</td>
+        </tr>`;
+        table.innerHTML += row;
       });
     }
 
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const keyword = this.value.toLowerCase();
-      const filtered = allData.filter(item =>
-        String(item.age).includes(keyword) ||
-        String(item.trestbps).includes(keyword) ||
-        String(item.chol).includes(keyword)
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const keyword = e.target.value.toLowerCase();
+      const filtered = originalData.filter(item =>
+        Object.values(item).some(val =>
+          String(val).toLowerCase().includes(keyword)
+        )
       );
       renderTable(filtered);
     });
+
+    fetchData();
   </script>
 </body>
 </html>
